@@ -47,6 +47,7 @@ I own a NAS and wanted sending files to it to take two taps from any app's share
 * [x] `commit` is the full hash (`c6a3537e5096404bd9f877d830c42ee59e33f10a`).
 
 ### Pipeline
-* [ ] Waiting for the pipeline. I built it locally with `fdroid build -l` (success) and ran `fdroid scanner` (0 problems). One thing to flag: the project uses Gradle 8.14.3 (required by AGP 8.13); my local fdroidserver 2.4.5 did not know that version's checksum, so if your `gradlew-fdroid` does not either I will switch the wrapper to a version in your table.
+* [x] All pipelines pass (https://gitlab.com/tonybenoy/fdroiddata/-/pipelines/3070061591): schema validation, `fdroid lint`, `fdroid rewritemeta`, `checkupdates`, `fdroid build` (Gradle 8.14.3 accepted), `check apk`, `check source code`, tools checks, git redirect.
+* [x] No warnings or errors in the Reports tab.
 
 /label ~"New App"
