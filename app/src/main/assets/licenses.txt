@@ -1,0 +1,12 @@
+SMB Drop uses these open-source components:
+
+• Roboto Flex font – SIL Open Font License 1.1 (Google)
+• smbj (SMB client) – Apache License 2.0
+• dcerpc (share listing) – Apache License 2.0
+• Bouncy Castle – MIT licence
+• SLF4J – MIT licence
+• Haze (backdrop blur) – Apache License 2.0
+• AndroidX, Jetpack Compose, Room, WorkManager, DataStore, Material 3 – Apache License 2.0
+• Kotlin and kotlinx.coroutines – Apache License 2.0
+
+Full licence texts are available at the projects' websites.

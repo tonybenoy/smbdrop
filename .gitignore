@@ -1,0 +1,18 @@
+# secrets
+keystore.properties
+*.jks
+*.keystore
+local.properties
+
+# build output
+build/
+.gradle/
+.kotlin/
+*.apk
+*.aab
+store/mapping.txt
+
+# IDE / OS
+.idea/
+*.iml
+.DS_Store

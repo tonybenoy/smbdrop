@@ -1,0 +1,19 @@
+SMB Drop hace que tu recurso SMB de casa u oficina (Synology, TrueNAS, Windows, Linux/Samba) parezca parte de tu teléfono. Sin nube, sin cuentas, sin anuncios, sin rastreo: tus archivos van solo a tu propio servidor.
+
+<b>Envía desde cualquier app</b>
+Toca Compartir en Galería, Archivos, WhatsApp o un navegador y elige SMB Drop. Una foto, 200 fotos o un vídeo de 4 GB. Textos y enlaces se guardan como notas. ¿Ya enviaste el archivo? Te avisamos.
+
+<b>Nunca falla en silencio</b>
+Cada archivo entra en una cola visible y reanudable. Si se cae el Wi-Fi, las subidas se pausan y continúan donde se quedaron.
+
+<b>Reglas y marcadores</b>
+Fotos a Photos/año/mes, PDF a Documents/Inbox, el resto a Drop, o crea tus reglas por tipo, extensión o app de origen. Marca carpetas y elígelas con un toque.
+
+<b>Copia automática</b>
+Respalda cámara, capturas o cualquier carpeta: solo Wi-Fi, solo cargando, un horario propio en los días que elijas. Nunca sube dos veces la misma foto.
+
+<b>Explora, copia y guarda sin conexión</b>
+Explora con miniaturas, busca, ordena, renombra, mueve y elimina (con deshacer). Copia archivos de un servidor a otro y guarda carpetas sin conexión. Tu servidor aparece en el selector de archivos de Android.
+
+<b>Privado y seguro</b>
+Contraseñas cifradas con el Android Keystore, bloqueo opcional con huella, solo SMB 2/3. Código abierto.
