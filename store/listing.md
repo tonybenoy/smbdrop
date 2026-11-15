@@ -86,7 +86,7 @@ Passwörter mit dem Android Keystore verschlüsselt, optionale Fingerabdrucksper
 
 ## Français (fr-FR)
 
-**Short description (80 max):** Envoyez, sauvegardez et ouvrez des fichiers sur votre NAS ou PC depuis toute appli.
+**Short description (80 max):** Envoyez, sauvegardez et ouvrez vos fichiers NAS ou PC depuis toute appli.
 
 **Full description:**
 
