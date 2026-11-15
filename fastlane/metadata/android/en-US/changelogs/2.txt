@@ -1,0 +1,1 @@
+Fixes: Browse no longer crashes when a server and a bookmark both exist; connections that drop after a network change are retried; the share card is now fully readable over any app; file sizes show correctly; clearer error when a file cannot be read. New: video and PDF thumbnails, privacy policy page.
