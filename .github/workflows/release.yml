@@ -1,0 +1,150 @@
+name: release
+
+# Releasing = bump versionName/versionCode in app/build.gradle.kts and add
+# fastlane/metadata/android/en-US/changelogs/<versionCode>.txt, then commit to main
+# (the GitHub web editor is enough). This workflow builds, signs and publishes the
+# release and creates the v<versionName> tag, which F-Droid watches.
+
+on:
+  push:
+    branches: [main]
+    paths: ['app/build.gradle.kts']
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Dry run: sign with a throwaway key, publish nothing'
+        type: boolean
+        default: true
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    env:
+      DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run && 'true' || 'false' }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Read version
+        id: v
+        run: |
+          name=$(sed -nE 's/.*versionName = "([^"]+)".*/\1/p' app/build.gradle.kts | head -1)
+          code=$(sed -nE 's/.*versionCode = ([0-9]+).*/\1/p' app/build.gradle.kts | head -1)
+          [ -n "$name" ] && [ -n "$code" ] || { echo "::error::could not read versionName/versionCode"; exit 1; }
+          echo "name=$name" >> "$GITHUB_OUTPUT"
+          echo "code=$code" >> "$GITHUB_OUTPUT"
+          echo "tag=v$name" >> "$GITHUB_OUTPUT"
+          echo "Version $name (code $code), tag v$name, dry run: $DRY_RUN"
+
+      - name: Already released?
+        id: check
+        run: |
+          if [ "$DRY_RUN" != "true" ] && git ls-remote --exit-code --tags origin "refs/tags/${{ steps.v.outputs.tag }}" > /dev/null 2>&1; then
+            echo "Tag ${{ steps.v.outputs.tag }} already exists - nothing to do."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Changelog exists for this versionCode
+        if: steps.check.outputs.skip != 'true'
+        run: |
+          f="fastlane/metadata/android/en-US/changelogs/${{ steps.v.outputs.code }}.txt"
+          test -s "$f" || { echo "::error::Add $f (max 500 characters) before releasing"; exit 1; }
+          [ "$(wc -c < "$f")" -le 500 ] || { echo "::error::$f is longer than 500 characters (F-Droid limit)"; exit 1; }
+
+      - uses: actions/setup-java@v4
+        if: steps.check.outputs.skip != 'true'
+        with: { distribution: temurin, java-version: 21 }
+
+      - name: Android SDK packages
+        if: steps.check.outputs.skip != 'true'
+        run: |
+          yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses > /dev/null || true
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platforms;android-36" "build-tools;35.0.0" > /dev/null
+
+      - uses: gradle/actions/setup-gradle@v4
+        if: steps.check.outputs.skip != 'true'
+
+      - name: Signing key
+        if: steps.check.outputs.skip != 'true'
+        env:
+          KEYSTORE_B64: ${{ secrets.SIGNING_KEYSTORE_BASE64 }}
+          STORE_PASSWORD: ${{ secrets.SIGNING_STORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.SIGNING_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.SIGNING_KEY_PASSWORD }}
+        run: |
+          ks="$RUNNER_TEMP/release.jks"
+          if [ "$DRY_RUN" = "true" ]; then
+            echo "Dry run: using a throwaway signing key."
+            pw=$(openssl rand -hex 16)
+            keytool -genkeypair -keystore "$ks" -storetype PKCS12 -alias dryrun -keyalg RSA -keysize 2048 \
+              -validity 2 -storepass "$pw" -keypass "$pw" -dname "CN=dry run" > /dev/null 2>&1
+            STORE_PASSWORD="$pw"; KEY_PASSWORD="$pw"; KEY_ALIAS=dryrun
+          else
+            [ -n "$KEYSTORE_B64" ] && [ -n "$STORE_PASSWORD" ] && [ -n "$KEY_ALIAS" ] && [ -n "$KEY_PASSWORD" ] \
+              || { echo "::error::Signing secrets are missing (SIGNING_KEYSTORE_BASE64, SIGNING_STORE_PASSWORD, SIGNING_KEY_ALIAS, SIGNING_KEY_PASSWORD)"; exit 1; }
+            echo "$KEYSTORE_B64" | base64 -d > "$ks"
+          fi
+          {
+            echo "storeFile=$ks"
+            echo "storePassword=$STORE_PASSWORD"
+            echo "keyAlias=$KEY_ALIAS"
+            echo "keyPassword=$KEY_PASSWORD"
+          } > keystore.properties
+
+      - name: Test and build
+        if: steps.check.outputs.skip != 'true'
+        run: ./gradlew :app:testDebugUnitTest :app:assembleRelease :app:bundleRelease --no-daemon
+
+      - name: Package and verify
+        if: steps.check.outputs.skip != 'true'
+        run: |
+          v="${{ steps.v.outputs.name }}"
+          mkdir -p dist
+          cp app/build/outputs/apk/release/app-release.apk "dist/SMBDrop-$v.apk"
+          cp app/build/outputs/bundle/release/app-release.aab "dist/SMBDrop-$v.aab"
+          bt="$ANDROID_HOME/build-tools/35.0.0"
+          "$bt/apksigner" verify --print-certs "dist/SMBDrop-$v.apk" | head -3
+          "$bt/aapt" dump badging "dist/SMBDrop-$v.apk" | grep -E "^package:" | tee /dev/stderr \
+            | grep -q "versionCode='${{ steps.v.outputs.code }}' versionName='$v'" \
+            || { echo "::error::built APK does not match the version in build.gradle.kts"; exit 1; }
+          (cd dist && sha256sum "SMBDrop-$v.apk" "SMBDrop-$v.aab" > SHA256SUMS.txt && cat SHA256SUMS.txt)
+
+      - name: Release notes
+        if: steps.check.outputs.skip != 'true'
+        run: |
+          {
+            cat "fastlane/metadata/android/en-US/changelogs/${{ steps.v.outputs.code }}.txt"
+            echo
+            echo
+            echo "Install: download \`SMBDrop-${{ steps.v.outputs.name }}.apk\` below (Android 8.0+). Verify it with \`SHA256SUMS.txt\`."
+            echo "This APK is signed with the project's release key; builds from F-Droid or Google Play use a different signature, so uninstall before switching sources."
+          } > notes.md
+          cat notes.md
+
+      - name: Publish release
+        if: steps.check.outputs.skip != 'true' && env.DRY_RUN != 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "${{ steps.v.outputs.tag }}" \
+            "dist/SMBDrop-${{ steps.v.outputs.name }}.apk" \
+            "dist/SMBDrop-${{ steps.v.outputs.name }}.aab" \
+            dist/SHA256SUMS.txt \
+            --target "$GITHUB_SHA" \
+            --title "SMB Drop ${{ steps.v.outputs.name }}" \
+            --notes-file notes.md \
+            --latest
+
+      - name: Keep dry-run output
+        if: steps.check.outputs.skip != 'true' && env.DRY_RUN == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: dry-run-release
+          path: dist/
+          retention-days: 3

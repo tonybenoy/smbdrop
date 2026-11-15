@@ -76,6 +76,14 @@ Single `app` module; packages mirror the design in [`docs/PLAN.md`](docs/PLAN.md
 
 Good to know: servers on a non-standard port use `host:port`; SMB1 is intentionally unsupported; servers that don't expose share listing (`IPC$`) still work — type the share name by hand.
 
+## Releasing
+Releases are automated (`.github/workflows/release.yml`). To publish a new version, edit on GitHub — no local build needed:
+1. In `app/build.gradle.kts` raise `versionCode` by 1 and set the new `versionName`.
+2. Add `fastlane/metadata/android/en-US/changelogs/<versionCode>.txt` (max 500 characters; it becomes the release notes and the F-Droid changelog).
+3. Commit to `main`.
+
+The workflow then runs the tests, builds and signs the APK and AAB, checks that they match the version, publishes a GitHub release with checksums and creates the `v<versionName>` tag. F-Droid watches those tags and builds its own copy automatically. **Actions → release → Run workflow** (dry run on) rehearses everything with a throwaway key and publishes nothing.
+
 ## Status and limitations
 SMB Drop is a young project (v1.0.0) developed and tested on a single physical device against Samba. Lightly tested or untested so far: video thumbnails, server-to-server copy, undo delete, other Android versions and other NAS brands. Spanish, French and Hindi were written without a native review. Bug reports from real setups are very welcome — please include the app version, Android version and server type.
 
