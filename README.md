@@ -86,7 +86,7 @@ Issues and pull requests are welcome.
 - **Screenshots:** `tools/capture-screenshot.sh` crops the status bar so nothing personal leaks. Only photograph a build connected to demo data, never your real server.
 
 ## Privacy
-The app collects nothing. Files and credentials go only to the server you configure. Full text: [`store/PRIVACY.md`](store/PRIVACY.md).
+The app collects nothing. Files and credentials go only to the server you configure. Full text: [tonybenoy.github.io/smbdrop/privacy.html](https://tonybenoy.github.io/smbdrop/privacy.html).
 
 ## License
 [Apache License 2.0](LICENSE).

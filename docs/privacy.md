@@ -1,0 +1,37 @@
+# SMB Drop — Privacy Policy
+
+_Last updated: 15 November 2026_
+
+SMB Drop (`com.tonybenoy.smbdrop`) is an open-source Android app by Tony Benoy that sends files from your phone to an SMB (Windows / NAS / Samba) file share that you own or are allowed to use, and lets you browse and open files on that share.
+
+## What we collect
+**Nothing.** SMB Drop has no account system, no analytics, no advertising and no crash reporting. The developer does not receive any data from the app, and the app does not contact any server other than the one you configure.
+
+## What the app stores on your phone
+- The servers you add: address, share name, folder, user name and the **encrypted** password. Passwords are encrypted with a key held in the Android Keystore and are only sent to your own server to sign in.
+- Your settings, routing rules, bookmarks, the upload queue and a list of files already uploaded (so the same file is not sent twice).
+- Temporary copies of files you share into the app, kept only until they are uploaded.
+- Copies of folders you choose to keep offline, and cached thumbnails of files on your server (capped at 200 MB). You can remove both inside the app or from Android settings → Storage.
+
+## Where your data goes
+Files and credentials are sent only to the server address you enter, over your local network or whatever connection you configure (SMB 2/3). Nothing is sent to the developer or to any third party.
+
+## Permissions
+- **Network and Wi-Fi state** — connect to your server and decide when to upload.
+- **Photos and videos** — back up your camera folder to your server, only if you turn backup on.
+- **Location (optional)** — Android requires it to read the Wi-Fi network name, used only for the "back up only on these Wi-Fi networks" option. Your location is not collected or stored.
+- **Notifications** — show upload progress and errors.
+- **Foreground service (data sync)** — keep uploads running while the screen is off.
+- **Biometrics (optional)** — lock the app.
+
+## Deleting your data
+Remove a server in Settings → Destinations, clear the app's storage, or uninstall the app. Files already on your server are under your control and are not affected.
+
+## Children
+The app is not directed at children and collects no personal information from anyone.
+
+## Changes
+If this policy changes, the new version is published at this address with an updated date.
+
+## Contact
+Questions about this policy: open an issue at <https://github.com/tonybenoy/smbdrop/issues>.

@@ -1,0 +1,5 @@
+title: SMB Drop
+description: Send, back up and open files on your NAS or PC share from any Android app.
+theme: jekyll-theme-minimal
+exclude:
+  - PLAN.md

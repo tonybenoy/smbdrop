@@ -12,7 +12,6 @@ val keystoreProps = Properties().apply { rootProject.file("keystore.properties")
 android {
     namespace = "com.tonybenoy.smbdrop"
     compileSdk = 36
-    buildToolsVersion = "37.0.0"
 
     defaultConfig {
         applicationId = "com.tonybenoy.smbdrop"
