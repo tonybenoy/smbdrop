@@ -82,7 +82,7 @@ Releases are automated (`.github/workflows/release.yml`). To publish a new versi
 2. Add `fastlane/metadata/android/en-US/changelogs/<versionCode>.txt` (max 500 characters; it becomes the release notes and the F-Droid changelog).
 3. Commit to `main`.
 
-The workflow then runs the tests, builds and signs the APK and AAB, checks that they match the version, publishes a GitHub release with checksums and creates the `v<versionName>` tag. F-Droid watches those tags and builds its own copy automatically. **Actions → release → Run workflow** (dry run on) rehearses everything with a throwaway key and publishes nothing.
+The workflow then runs the tests, builds and signs the APK, checks that they match the version, publishes a GitHub release with checksums and creates the `v<versionName>` tag. F-Droid watches those tags and builds its own copy automatically. **Actions → release → Run workflow** (dry run on) rehearses everything with a throwaway key and publishes nothing. The Play Store bundle (AAB) is signed with a separate upload key and built locally — see [`store/release-checklist.md`](store/release-checklist.md).
 
 ## Status and limitations
 SMB Drop is a young project (v1.0.0) developed and tested on a single physical device against Samba. Lightly tested or untested so far: video thumbnails, server-to-server copy, undo delete, other Android versions and other NAS brands. Spanish, French and Hindi were written without a native review. Bug reports from real setups are very welcome — please include the app version, Android version and server type.

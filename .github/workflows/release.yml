@@ -99,7 +99,7 @@ jobs:
 
       - name: Test and build
         if: steps.check.outputs.skip != 'true'
-        run: ./gradlew :app:testDebugUnitTest :app:assembleRelease :app:bundleRelease --no-daemon
+        run: ./gradlew :app:testDebugUnitTest :app:assembleRelease --no-daemon
 
       - name: Package and verify
         if: steps.check.outputs.skip != 'true'
@@ -107,13 +107,12 @@ jobs:
           v="${{ steps.v.outputs.name }}"
           mkdir -p dist
           cp app/build/outputs/apk/release/app-release.apk "dist/SMBDrop-$v.apk"
-          cp app/build/outputs/bundle/release/app-release.aab "dist/SMBDrop-$v.aab"
           bt="$ANDROID_HOME/build-tools/35.0.0"
           "$bt/apksigner" verify --print-certs "dist/SMBDrop-$v.apk" | head -3
           "$bt/aapt" dump badging "dist/SMBDrop-$v.apk" | grep -E "^package:" | tee /dev/stderr \
             | grep -q "versionCode='${{ steps.v.outputs.code }}' versionName='$v'" \
             || { echo "::error::built APK does not match the version in build.gradle.kts"; exit 1; }
-          (cd dist && sha256sum "SMBDrop-$v.apk" "SMBDrop-$v.aab" > SHA256SUMS.txt && cat SHA256SUMS.txt)
+          (cd dist && sha256sum "SMBDrop-$v.apk" > SHA256SUMS.txt && cat SHA256SUMS.txt)
 
       - name: Release notes
         if: steps.check.outputs.skip != 'true'
@@ -123,7 +122,7 @@ jobs:
             echo
             echo
             echo "Install: download \`SMBDrop-${{ steps.v.outputs.name }}.apk\` below (Android 8.0+). Verify it with \`SHA256SUMS.txt\`."
-            echo "This APK is signed with the project's release key; builds from F-Droid or Google Play use a different signature, so uninstall before switching sources."
+            echo "This APK is signed with the project's GitHub release key; builds from F-Droid or Google Play use a different signature, so uninstall before switching sources."
           } > notes.md
           cat notes.md
 
@@ -134,7 +133,6 @@ jobs:
         run: |
           gh release create "${{ steps.v.outputs.tag }}" \
             "dist/SMBDrop-${{ steps.v.outputs.name }}.apk" \
-            "dist/SMBDrop-${{ steps.v.outputs.name }}.aab" \
             dist/SHA256SUMS.txt \
             --target "$GITHUB_SHA" \
             --title "SMB Drop ${{ steps.v.outputs.name }}" \

@@ -1,0 +1,1 @@
+First release built and signed automatically by GitHub Actions, with a new signing key: uninstall any earlier APK before installing this one. No functional changes; store listing text fixes only.
